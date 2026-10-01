@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aprenda a Salvar Arquivos em Python | Guia Didático</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0284c7',
+              700: '#0369a1',
+              900: '#0c4a6e',
+            },
+            python: {
+              yellow: '#ffde57',
+              blue: '#4584b6',
+              dark: '#1e293b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Prism.js Syntax Highlighting CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    code, pre {
+      font-family: 'Fira Code', monospace !important;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white transition-colors duration-300">
+
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-amber-400 flex items-center justify-center text-slate-950 font-bold text-xl shadow-lg shadow-sky-500/20">
+          <i class="fa-brands fa-python"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-white tracking-tight">Python File Academy</h1>
+          <p class="text-xs text-sky-400 font-medium">Manipulação de Arquivos com Funções</p>
+        </div>
+      </div>
+
+      <!-- Links de Navegação -->
+      <nav class="hidden md:flex items-center space-x-1 text-sm font-medium">
+        <a href="#conceitos" class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">Conceitos</a>
+        <a href="#formatos" class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">Funções (.txt, .json, .csv)</a>
+        <a href="#modos" class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">Modos 'w' vs 'a'</a>
+        <a href="#simulador" class="px-3 py-2 rounded-lg text-sky-400 bg-sky-950/50 hover:bg-sky-900/50 border border-sky-800/50 transition">Simulador</a>
+        <a href="#quiz" class="px-3 py-2 rounded-lg text-amber-400 bg-amber-950/40 hover:bg-amber-900/40 border border-amber-800/40 transition">Quiz</a>
+      </nav>
+
+      <!-- Botão de Tema -->
+      <div class="flex items-center space-x-2">
+        <button id="theme-toggle" onclick="toggleTheme()" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition" title="Alternar tema">
+          <i class="fa-solid fa-moon text-amber-400" id="theme-icon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+    <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 border border-slate-800 p-8 sm:p-12 shadow-2xl">
+      <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-10 -top-10 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-3xl">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20 mb-4">
+          <i class="fa-solid fa-graduation-cap"></i> Guia Prático para Estudantes
+        </span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+          Como Salvar Dados em Arquivos com <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-amber-300">Python</span>
+        </h2>
+        <p class="mt-4 text-base sm:text-lg text-slate-300 leading-relaxed">
+          Aprenda a modularizar seu código criando funções reutilizáveis para guardar dados em arquivos <strong>TXT</strong>, <strong>JSON</strong> e <strong>CSV</strong>. Teste o código em tempo real e simule o salvamento de arquivos no seu próprio navegador!
+        </p>
+        
+        <div class="mt-6 flex flex-wrap gap-4">
+          <a href="#simulador" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold shadow-lg shadow-sky-600/30 transition">
+            <i class="fa-solid fa-flask"></i> Abrir Simulador Interativo
+          </a>
+          <a href="#formatos" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition">
+            <i class="fa-solid fa-code"></i> Ver Código das Funções
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="conceitos" class="scroll-mt-20">
+      <div class="mb-6">
+        <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-lightbulb text-amber-400"></i>
+          1. Conceitos Fundamentais
+        </h3>
+        <p class="text-slate-400 text-sm mt-1">Por que salvar dados e por que usar a instrução <code>with open()</code>?</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-slate-800/60 border border-slate-800 rounded-2xl p-6 hover:border-slate-700 transition">
+          <div class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center text-xl mb-4">
+            <i class="fa-solid fa-floppy-disk"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-white mb-2">Persistência de Dados</h4>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            Variáveis na memória RAM desaparecem quando o programa fecha. Salvar em arquivo garante que as informações fiquem gravadas no disco rígido permanentemente.
+          </p>
+        </div>
+
+        <div class="bg-slate-800/60 border border-slate-800 rounded-2xl p-6 hover:border-slate-700 transition">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl mb-4">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-white mb-2">O Poder do <code>with open()</code></h4>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            O gerenciador de contexto <code>with</code> garante que o arquivo seja <strong>fechado automaticamente</strong> assim que o bloco terminar, prevenindo corrupção de dados e vazamento de memória.
+          </p>
+        </div>
+
+        <div class="bg-slate-800/60 border border-slate-800 rounded-2xl p-6 hover:border-slate-700 transition">
+          <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center text-xl mb-4">
+            <i class="fa-solid fa-cubes"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-white mb-2">Uso de Funções</h4>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            Encapsular o código de salvamento em uma <strong>função</strong> evita repetição (princípio DRY) e permite salvar dados de qualquer lugar da sua aplicação com apenas uma linha.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="formatos" class="scroll-mt-20">
+      <div class="mb-6">
+        <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-file-code text-sky-400"></i>
+          2. Funções Prontas por Formato
+        </h3>
+        <p class="text-slate-400 text-sm mt-1">Copie e utilize estas funções no seu projeto Python.</p>
+      </div>
+
+      <!-- Abas de Formato -->
+      <div class="bg-slate-800/40 border border-slate-800 rounded-2xl overflow-hidden p-2">
+        <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-2 px-2">
+          <button onclick="switchTab('txt')" id="tab-btn-txt" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 bg-sky-600 text-white shadow-md transition">
+            <i class="fa-regular fa-file-lines"></i> Texto (.txt)
+          </button>
+          <button onclick="switchTab('json')" id="tab-btn-json" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800 transition">
+            <i class="fa-solid fa-code"></i> JSON (.json)
+          </button>
+          <button onclick="switchTab('csv')" id="tab-btn-csv" class="tab-btn px-4 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800 transition">
+            <i class="fa-solid fa-table"></i> CSV (.csv)
+          </button>
+        </div>
+
+        <!-- Conteúdo Aba TXT -->
+        <div id="tab-content-txt" class="tab-content p-4 sm:p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h4 class="text-lg font-bold text-white">Salvar Texto Simples (.txt)</h4>
+              <p class="text-xs text-slate-400">Ideal para logs, mensagens, anotações e conteúdos corridos.</p>
+            </div>
+            <button onclick="copyCode('code-txt')" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold transition border border-slate-600">
+              <i class="fa-regular fa-copy"></i> Copiar Código
+            </button>
+          </div>
+          <pre class="rounded-xl bg-slate-950 border border-slate-800 p-4 text-xs sm:text-sm overflow-x-auto custom-scrollbar"><code id="code-txt" class="language-python">def salvar_texto(caminho_arquivo: str, conteudo: str, modo: str = 'w') -> None:
+    """
+    Salva uma string em um arquivo de texto (.txt).
+    :param caminho_arquivo: Nome ou caminho do arquivo (ex: 'log.txt')
+    :param conteudo: O texto a ser gravado
+    :param modo: 'w' para sobrescrever, 'a' para adicionar ao final
+    """
+    with open(caminho_arquivo, modo, encoding='utf-8') as arquivo:
+        arquivo.write(conteudo + '\n')
+    print(f"✅ Sucesso: Texto salvo em '{caminho_arquivo}'.")
+
+# --- Exemplo de Uso ---
+mensagem = "Relatório Diário: Todos os sistemas funcionando perfeitamente."
+salvar_texto("diario.txt", mensagem)
+salvar_texto("diario.txt", "Nova linha adicionada no final.", modo='a')</code></pre>
+        </div>
+
+        <!-- Conteúdo Aba JSON -->
+        <div id="tab-content-json" class="tab-content hidden p-4 sm:p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h4 class="text-lg font-bold text-white">Salvar Estruturas Complexas (.json)</h4>
+              <p class="text-xs text-slate-400">Ideal para Dicionários e Listas (preserva tipos de dados).</p>
+            </div>
+            <button onclick="copyCode('code-json')" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold transition border border-slate-600">
+              <i class="fa-regular fa-copy"></i> Copiar Código
+            </button>
+          </div>
+          <pre class="rounded-xl bg-slate-950 border border-slate-800 p-4 text-xs sm:text-sm overflow-x-auto custom-scrollbar"><code id="code-json" class="language-python">import json
+
+def salvar_json(caminho_arquivo: str, dados: dict | list) -> None:
+    """
+    Salva um dicionário ou lista em formato JSON.
+    :param caminho_arquivo: Nome do arquivo (ex: 'aluno.json')
+    :param dados: Dicionário ou Lista do Python
+    """
+    with open(caminho_arquivo, 'w', encoding='utf-8') as arquivo:
+        # indent=4 deixa o arquivo formatado e legivel
+        # ensure_ascii=False garante acentos corretos (ç, á, ã)
+        json.dump(dados, arquivo, indent=4, ensure_ascii=False)
+    print(f"✅ Sucesso: Dados JSON salvos em '{caminho_arquivo}'.")
+
+# --- Exemplo de Uso ---
+aluno = {
+    "nome": "Mariana Silva",
+    "idade": 21,
+    "cursos": ["Python", "Banco de Dados"],
+    "ativo": True
+}
+salvar_json("aluno.json", aluno)</code></pre>
+        </div>
+
+        <!-- Conteúdo Aba CSV -->
+        <div id="tab-content-csv" class="tab-content hidden p-4 sm:p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h4 class="text-lg font-bold text-white">Salvar Dados Tabulares (.csv)</h4>
+              <p class="text-xs text-slate-400">Perfeito para tabelas acessíveis no Excel ou Google Planilhas.</p>
+            </div>
+            <button onclick="copyCode('code-csv')" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold transition border border-slate-600">
+              <i class="fa-regular fa-copy"></i> Copiar Código
+            </button>
+          </div>
+          <pre class="rounded-xl bg-slate-950 border border-slate-800 p-4 text-xs sm:text-sm overflow-x-auto custom-scrollbar"><code id="code-csv" class="language-python">import csv
+
+def salvar_csv(caminho_arquivo: str, cabecalho: list, linhas: list, modo: str = 'w') -> None:
+    """
+    Salva uma tabela em formato CSV.
+    :param caminho_arquivo: Nome do arquivo (ex: 'notas.csv')
+    :param cabecalho: Lista com nomes das colunas ['Nome', 'Nota']
+    :param linhas: Lista de listas contendo os valores
+    :param modo: 'w' sobrescreve, 'a' adiciona novas linhas
+    """
+    # newline='' impede a criacao de linhas em branco extras no Windows
+    with open(caminho_arquivo, modo, newline='', encoding='utf-8') as arquivo:
+        escritor = csv.writer(arquivo)
+        
+        # Grava o cabecalho apenas se estiver criando um arquivo novo (modo 'w')
+        if modo == 'w' and cabecalho:
+            escritor.writerow(cabecalho)
+            
+        escritor.writerows(linhas)
+    print(f"✅ Sucesso: Tabela CSV salva em '{caminho_arquivo}'.")
+
+# --- Exemplo de Uso ---
+colunas = ["Nome", "Nota 1", "Nota 2", "Situação"]
+estudantes = [
+    ["Ana Souza", 9.5, 8.0, "Aprovado"],
+    ["Bruno Lima", 6.0, 5.5, "Recuperação"]
+]
+salvar_csv("turma.csv", colunas, estudantes)</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="modos" class="scroll-mt-20">
+      <div class="mb-6">
+        <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-arrows-split-up-and-left text-purple-400"></i>
+          3. Comparativo Importante: Modo 'w' vs 'a'
+        </h3>
+        <p class="text-slate-400 text-sm mt-1">Entenda a diferença crucial do parâmetro de abertura do arquivo.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Modo W -->
+        <div class="bg-slate-800/40 border border-rose-500/30 rounded-2xl p-6 relative overflow-hidden">
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-lg bg-rose-500/20 text-rose-400 font-mono font-bold text-sm border border-rose-500/30">modo = 'w' (Write)</span>
+            <span class="text-xs text-rose-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> Sobrescreve</span>
+          </div>
+          <h4 class="text-base font-bold text-white mb-2">Apaga o conteúdo anterior!</h4>
+          <p class="text-sm text-slate-300 leading-relaxed mb-4">
+            Se o arquivo já existir, o modo <code class="text-rose-300">'w'</code> <strong>limpa totalmente</strong> o conteúdo que estava lá dentro e grava o novo texto do zero.
+          </p>
+          <div class="p-3 bg-slate-950 rounded-xl font-mono text-xs text-slate-400 border border-slate-800">
+            open("arquivo.txt", <span class="text-rose-400 font-bold">'w'</span>) <span class="text-slate-500"># Apaga tudo -> Escreve novo</span>
+          </div>
+        </div>
+
+        <!-- Modo A -->
+        <div class="bg-slate-800/40 border border-emerald-500/30 rounded-2xl p-6 relative overflow-hidden">
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 font-mono font-bold text-sm border border-emerald-500/30">modo = 'a' (Append)</span>
+            <span class="text-xs text-emerald-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-plus-circle"></i> Anexa ao final</span>
+          </div>
+          <h4 class="text-base font-bold text-white mb-2">Preserva o histórico!</h4>
+          <p class="text-sm text-slate-300 leading-relaxed mb-4">
+            O modo <code class="text-emerald-300">'a'</code> abre o arquivo posicionando o cursor no final. O novo conteúdo é <strong>adicionado ao final</strong> sem apagar o que já existe.
+          </p>
+          <div class="p-3 bg-slate-950 rounded-xl font-mono text-xs text-slate-400 border border-slate-800">
+            open("arquivo.txt", <span class="text-emerald-400 font-bold">'a'</span>) <span class="text-slate-500"># Mantém tudo -> Adiciona ao fim</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="simulador" class="scroll-mt-20">
+      <div class="mb-6">
+        <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-flask text-amber-400"></i>
+          4. Simulador Prático Interativo
+        </h3>
+        <p class="text-slate-400 text-sm mt-1">Insira seus dados abaixo, veja a função Python correspondente ser montada e faça o download do arquivo de verdade!</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-800/30 border border-slate-800 rounded-3xl p-6">
+        
+        <!-- Formulário de Entrada (Coluna Esquerda) -->
+        <div class="lg:col-span-5 space-y-4">
+          <h4 class="text-base font-bold text-white border-b border-slate-800 pb-2"> Configuração dos Dados</h4>
+          
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Tipo de Arquivo:</label>
+            <select id="sim-format" onchange="updateSimulatedCode()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500">
+              <option value="txt">Arquivo de Texto (.txt)</option>
+              <option value="json">Objeto JSON (.json)</option>
+              <option value="csv">Tabela CSV (.csv)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Nome do Arquivo:</label>
+            <input type="text" id="sim-filename" value="meus_dados.txt" oninput="updateSimulatedCode()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 font-mono" />
+          </div>
+
+          <div id="sim-mode-container">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Modo de Abertura:</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900 border border-slate-700 cursor-pointer text-xs text-slate-300 hover:border-slate-600">
+                <input type="radio" name="sim-mode" value="w" checked onchange="updateSimulatedCode()" class="text-sky-500 focus:ring-0">
+                <span><code>'w'</code> (Sobrescrever)</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900 border border-slate-700 cursor-pointer text-xs text-slate-300 hover:border-slate-600">
+                <input type="radio" name="sim-mode" value="a" onchange="updateSimulatedCode()" class="text-sky-500 focus:ring-0">
+                <span><code>'a'</code> (Anexar)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Input TXT -->
+          <div id="input-group-txt">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Conteúdo do Texto:</label>
+            <textarea id="sim-content-txt" rows="4" oninput="updateSimulatedCode()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 font-mono focus:outline-none focus:border-sky-500 custom-scrollbar">Olá! Este é um teste prático de salvamento de arquivos em Python.</textarea>
+          </div>
+
+          <!-- Input JSON -->
+          <div id="input-group-json" class="hidden space-y-2">
+            <label class="block text-xs font-semibold text-slate-300">Campos do Aluno/Usuário:</label>
+            <div class="grid grid-cols-2 gap-2">
+              <input type="text" id="sim-json-nome" value="Carlos Eduardo" placeholder="Nome" oninput="updateSimulatedCode()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200">
+              <input type="number" id="sim-json-idade" value="25" placeholder="Idade" oninput="updateSimulatedCode()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200">
+            </div>
+            <input type="text" id="sim-json-cidade" value="Curitiba" placeholder="Cidade" oninput="updateSimulatedCode()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200">
+          </div>
+
+          <!-- Input CSV -->
+          <div id="input-group-csv" class="hidden space-y-2">
+            <label class="block text-xs font-semibold text-slate-300">Linhas da Tabela (separadas por vírgula):</label>
+            <p class="text-[11px] text-slate-400">Cabeçalho fixo: <code>Nome, Idade, Curso</code></p>
+            <textarea id="sim-content-csv" rows="3" oninput="updateSimulatedCode()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 font-mono focus:outline-none focus:border-sky-500 custom-scrollbar">Beatriz, 22, Engenharia
+Lucas, 28, Ciência de Dados</textarea>
+          </div>
+
+          <button onclick="downloadGeneratedFile()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition">
+            <i class="fa-solid fa-download"></i> Executar e Baixar Arquivo Real
+          </button>
+        </div>
+
+        <!-- Saída do Código Gerado (Coluna Direita) -->
+        <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+              <h4 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-code text-sky-400"></i> Código Python Dinâmico
+              </h4>
+              <span class="text-xs font-mono text-slate-400">Gerado Automaticamente</span>
+            </div>
+            
+            <pre class="rounded-2xl bg-slate-950 border border-slate-800 p-4 text-xs sm:text-sm custom-scrollbar min-h-[260px]"><code id="simulated-python-code" class="language-python"># O código aparecerá aqui...</code></pre>
+          </div>
+
+          <!-- Console Simulado -->
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs">
+            <div class="text-slate-500 mb-1 text-[10px] uppercase font-bold tracking-wider">Console Terminal Simulado</div>
+            <div id="simulated-terminal" class="text-emerald-400">
+              > Aguardando execução...
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="quiz" class="scroll-mt-20">
+      <div class="mb-6">
+        <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-clipboard-question text-amber-400"></i>
+          5. Teste Seus Conhecimentos (Quiz)
+        </h3>
+        <p class="text-slate-400 text-sm mt-1">Responda às questões abaixo para verificar o que você aprendeu!</p>
+      </div>
+
+      <div class="bg-slate-800/30 border border-slate-800 rounded-3xl p-6 space-y-8">
+        
+        <!-- Questão 1 -->
+        <div class="quiz-q space-y-3" data-correct="B">
+          <h4 class="text-base font-semibold text-white">
+            1. Qual é a principal vantagem de utilizar a instrução <code class="text-sky-300">with open(...)</code> em Python?
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+            <button onclick="selectOption(this, 'A')" class="opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300">
+              A) Deixa a execução do código 2 vezes mais rápida.
+            </button>
+            <button onclick="selectOption(this, 'B')" class="opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300">
+              B) Fecha o arquivo automaticamente, evitando corrupção.
+            </button>
+            <button onclick="selectOption(this, 'C')" class="opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300">
+              C) Impede que o sistema operacional leia o arquivo.
+            </button>
+            <button onclick="selectOption(this, 'D')" class="opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300">
+              D) Salva o arquivo diretamente na nuvem.
+            </button>
+          </div>
+          <div class="feedback hidden p-3 rounded-xl text-xs font-semibold"></div>
+        </div>
+
+        <!-- Questão 2 -->
+        <div class="quiz-q space-y-3" data-correct="C">
+          <h4 class="text-base font-semibold text-white">
+            2. Se você abrir um arquivo existente utilizando o modo <code class="text-rose-300">'w'</code>, o que acontecerá?
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+            <button onclick="selectOption(this, 'A')" class="opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300">
+              A) Os novos dados serão adicionados ao final do arquivo.
+            </button>
+            <button onclick="selectOption(this, 'B')" class="opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300">
+              B) O Python gerará um erro de permissão.
+            </button>
+            <button onclick="selectOption(this, 'C')" class="opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300">
+              C) Todo o conteúdo antigo será apagado/sobrescrito.
+            </button>
+            <button onclick="selectOption(this, 'D')" class="opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300">
+              D) O arquivo será duplicado com um novo nome.
+            </button>
+          </div>
+          <div class="feedback hidden p-3 rounded-xl text-xs font-semibold"></div>
+        </div>
+
+        <!-- Questão 3 -->
+        <div class="quiz-q space-y-3" data-correct="A">
+          <h4 class="text-base font-semibold text-white">
+            3. Na função <code class="text-sky-300">json.dump()</code>, para que serve o parâmetro <code class="text-amber-300">ensure_ascii=False</code>?
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+            <button onclick="selectOption(this, 'A')" class="opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300">
+              A) Para permitir acentos e ç sem convertê-los em códigos.
+            </button>
+            <button onclick="selectOption(this, 'B')" class="opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300">
+              B) Para criptografar o arquivo JSON.
+            </button>
+            <button onclick="selectOption(this, 'C')" class="opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300">
+              C) Para formatar a saída com recuos e espaços.
+            </button>
+            <button onclick="selectOption(this, 'D')" class="opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300">
+              D) Para converter o JSON em uma tabela CSV.
+            </button>
+          </div>
+          <div class="feedback hidden p-3 rounded-xl text-xs font-semibold"></div>
+        </div>
+
+        <!-- Placar Final do Quiz -->
+        <div class="border-t border-slate-800 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="text-sm text-slate-300">
+            Seu Desempenho: <span id="quiz-score" class="font-bold text-amber-400 text-lg">0 / 3</span> questões respondidas
+          </div>
+          <button onclick="resetQuiz()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition">
+            <i class="fa-solid fa-rotate-right"></i> Reiniciar Quiz
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-slate-950 border-t border-slate-800 py-8 mt-12 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="text-slate-400 font-medium">Material Didático Interativo de Python - Manipulação de Arquivos</p>
+      <p class="mt-1">Desenvolvido para aulas e consultas rápidas de estudantes de programação.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+  <script>
+    // --- LÓGICA DE TEMAS (LIGHT / DARK) ---
+    function toggleTheme() {
+      const html = document.documentElement;
+      const icon = document.getElementById('theme-icon');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        icon.className = 'fa-solid fa-sun text-amber-500';
+      } else {
+        html.classList.add('dark');
+        icon.className = 'fa-solid fa-moon text-amber-400';
+      }
+    }
+
+    // --- TOAST NOTIFICATIONS ---
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const bgColor = type === 'success' ? 'bg-emerald-600' : 'bg-sky-600';
+      const icon = type === 'success' ? 'fa-circle-check' : 'fa-info-circle';
+
+      toast.className = `pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-xl text-white text-xs font-semibold shadow-2xl ${bgColor} transition-all duration-300 transform translate-y-2 opacity-0`;
+      toast.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`;
+      
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // --- COPIAR CÓDIGO COM FALLBACK SEGURO ---
+    function copyCode(elementId) {
+      const codeElement = document.getElementById(elementId);
+      const text = codeElement.innerText;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('Código copiado para a área de transferência!');
+        }).catch(() => fallbackCopy(text));
+      } else {
+        fallbackCopy(text);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-9999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast('Código copiado para a área de transferência!');
+      } catch (err) {
+        showToast('Erro ao copiar código.', 'error');
+      }
+      document.body.removeChild(textArea);
+    }
+
+    // --- TROCA DE ABAS ---
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-sky-600', 'text-white', 'shadow-md');
+        btn.classList.add('text-slate-400');
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+
+      const activeBtn = document.getElementById(`tab-btn-${tab}`);
+      const activeContent = document.getElementById(`tab-content-${tab}`);
+
+      activeBtn.classList.add('bg-sky-600', 'text-white', 'shadow-md');
+      activeBtn.classList.remove('text-slate-400');
+      activeContent.classList.remove('hidden');
+    }
+
+    // --- LÓGICA DO SIMULADOR PRÁTICO ---
+    function updateSimulatedCode() {
+      const format = document.getElementById('sim-format').value;
+      const filename = document.getElementById('sim-filename').value || `arquivo.${format}`;
+      const mode = document.querySelector('input[name="sim-mode"]:checked').value;
+
+      // Oculta/Exibe inputs específicos
+      document.getElementById('input-group-txt').classList.toggle('hidden', format !== 'txt');
+      document.getElementById('input-group-json').classList.toggle('hidden', format !== 'json');
+      document.getElementById('input-group-csv').classList.toggle('hidden', format !== 'csv');
+      
+      // Oculta opção 'a' para JSON já que JSON precisa sobrescrever para manter estrutura válida
+      const modeContainer = document.getElementById('sim-mode-container');
+      if (format === 'json') {
+        modeContainer.classList.add('opacity-40', 'pointer-events-none');
+      } else {
+        modeContainer.classList.remove('opacity-40', 'pointer-events-none');
+      }
+
+      let codePython = "";
+
+      if (format === 'txt') {
+        const textContent = document.getElementById('sim-content-txt').value;
+        codePython = `def salvar_texto(caminho, conteudo, modo='${mode}'):
+    with open(caminho, modo, encoding='utf-8') as arquivo:
+        arquivo.write(conteudo + '\\n')
+
+# Chamada da função com seus dados:
+conteudo = """${textContent}"""
+salvar_texto("${filename}", conteudo)`;
+      } else if (format === 'json') {
+        const nome = document.getElementById('sim-json-nome').value || "Sem nome";
+        const idade = parseInt(document.getElementById('sim-json-idade').value) || 0;
+        const cidade = document.getElementById('sim-json-cidade').value || "Não informada";
+
+        codePython = `import json
+
+def salvar_json(caminho, dados):
+    with open(caminho, 'w', encoding='utf-8') as arquivo:
+        json.dump(dados, arquivo, indent=4, ensure_ascii=False)
+
+# Chamada da função com seus dados:
+dados_aluno = {
+    "nome": "${nome}",
+    "idade": ${idade},
+    "cidade": "${cidade}"
+}
+salvar_json("${filename}", dados_aluno)`;
+      } else if (format === 'csv') {
+        const rawLines = document.getElementById('sim-content-csv').value.split('\n');
+        const formattedLines = rawLines.map(l => {
+          const parts = l.split(',').map(p => `"${p.trim()}"`);
+          return `    [${parts.join(', ')}]`;
+        }).join(',\n');
+
+        codePython = `import csv
+
+def salvar_csv(caminho, cabecalho, linhas, modo='${mode}'):
+    with open(caminho, modo, newline='', encoding='utf-8') as arquivo:
+        escritor = csv.writer(arquivo)
+        if modo == 'w' and cabecalho:
+            escritor.writerow(cabecalho)
+        escritor.writerows(linhas)
+
+# Chamada da função com seus dados:
+colunas = ["Nome", "Idade", "Curso"]
+dados_tabela = [
+${formattedLines}
+]
+salvar_csv("${filename}", colunas, dados_tabela)`;
+      }
+
+      const codeElem = document.getElementById('simulated-python-code');
+      codeElem.textContent = codePython;
+      Prism.highlightElement(codeElem);
+    }
+
+    // --- GERAR E BAIXAR ARQUIVO REAL (BLOB) ---
+    function downloadGeneratedFile() {
+      const format = document.getElementById('sim-format').value;
+      let filename = document.getElementById('sim-filename').value || `arquivo.${format}`;
+      if (!filename.endsWith(`.${format}`)) {
+        filename += `.${format}`;
+      }
+
+      let fileContent = "";
+      let mimeType = "text/plain";
+
+      if (format === 'txt') {
+        fileContent = document.getElementById('sim-content-txt').value + '\n';
+        mimeType = "text/plain";
+      } else if (format === 'json') {
+        const obj = {
+          nome: document.getElementById('sim-json-nome').value || "Sem nome",
+          idade: parseInt(document.getElementById('sim-json-idade').value) || 0,
+          cidade: document.getElementById('sim-json-cidade').value || "Não informada"
+        };
+        fileContent = JSON.stringify(obj, null, 4);
+        mimeType = "application/json";
+      } else if (format === 'csv') {
+        const lines = document.getElementById('sim-content-csv').value;
+        fileContent = "Nome,Idade,Curso\n" + lines;
+        mimeType = "text/csv";
+      }
+
+      // Download do Blob
+      const blob = new Blob([fileContent], { type: `${mimeType};charset=utf-8;` });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Atualiza terminal simulado
+      const terminal = document.getElementById('simulated-terminal');
+      terminal.innerHTML = `> [${new Date().toLocaleTimeString()}] Executando script Python...<br><span class="text-emerald-400">✅ Arquivo '${filename}' gerado e baixado com sucesso!</span>`;
+
+      showToast(`Arquivo '${filename}' baixado com sucesso!`);
+    }
+
+    // --- LÓGICA DO QUIZ ---
+    const userAnswers = {};
+
+    function selectOption(btn, choice) {
+      const questionCard = btn.closest('.quiz-q');
+      const correctAnswer = questionCard.getAttribute('data-correct');
+      const feedback = questionCard.querySelector('.feedback');
+      const qIndex = Array.from(document.querySelectorAll('.quiz-q')).indexOf(questionCard);
+
+      // Desabilita botões da mesma questão
+      questionCard.querySelectorAll('.opt-btn').forEach(b => {
+        b.classList.remove('bg-sky-900', 'border-sky-500', 'bg-emerald-950', 'bg-rose-950');
+        b.disabled = true;
+      });
+
+      userAnswers[qIndex] = (choice === correctAnswer);
+
+      if (choice === correctAnswer) {
+        btn.classList.add('bg-emerald-950', 'border-emerald-500', 'text-emerald-200');
+        feedback.className = "feedback p-3 rounded-xl text-xs font-semibold bg-emerald-950/60 border border-emerald-800 text-emerald-300";
+        feedback.innerHTML = "✨ Correto! Parabéns!";
+      } else {
+        btn.classList.add('bg-rose-950', 'border-rose-500', 'text-rose-200');
+        feedback.className = "feedback p-3 rounded-xl text-xs font-semibold bg-rose-950/60 border border-rose-800 text-rose-300";
+        feedback.innerHTML = `❌ Ops! A resposta correta é a letra <strong>${correctAnswer}</strong>.`;
+      }
+
+      feedback.classList.remove('hidden');
+      updateQuizScore();
+    }
+
+    function updateQuizScore() {
+      const total = document.querySelectorAll('.quiz-q').length;
+      const correctCount = Object.values(userAnswers).filter(Boolean).length;
+      document.getElementById('quiz-score').innerText = `${correctCount} / ${total}`;
+    }
+
+    function resetQuiz() {
+      document.querySelectorAll('.quiz-q').forEach((q) => {
+        q.querySelectorAll('.opt-btn').forEach(btn => {
+          btn.disabled = false;
+          btn.className = "opt-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-left hover:border-slate-500 transition text-slate-300";
+        });
+        const feedback = q.querySelector('.feedback');
+        feedback.classList.add('hidden');
+      });
+      for (let key in userAnswers) delete userAnswers[key];
+      document.getElementById('quiz-score').innerText = `0 / 3`;
+      showToast('Quiz reiniciado!');
+    }
+
+    // Inicializa código simulado na carga
+    window.onload = function() {
+      updateSimulatedCode();
+    };
+  </script>
+</body>
+</html>
